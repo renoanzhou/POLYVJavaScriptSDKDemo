@@ -1,0 +1,133 @@
+<!-- 纯前端请求demo -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>cloud</title>
+    <link
+      rel="stylesheet"
+      href="https://player.polyv.net/jssdk/polyv-chatroom.min.css"
+    />
+    <style>
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        background: #111c2d;
+      }
+      .p-live {
+        display: flex;
+        justify-content: space-between;
+        width: 1200px;
+        height: 678px;
+        margin: 0 auto;
+        padding-top: 40px;
+      }
+      .p-live__main {
+        width: 840px;
+      }
+      .p-live__side {
+        width: 340px;
+        font-size: 0;
+      }
+      .p-live__ppt {
+        width: 840px;
+        height: 630px;
+      }
+      .p-live__player {
+        width: 340px;
+        height: 225px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="p-live">
+      <div class="p-live__main">
+        <div class="p-live__ppt"></div>
+      </div>
+      <div class="p-live__side">
+        <div class="p-live__player"></div>
+        <div class="p-live__chatroom"></div>
+      </div>
+    </div>
+    <script src="https://player.polyv.net/livesdk/polyv-live.min.js"></script>
+    <script src="https://cdn.bootcss.com/blueimp-md5/2.11.0/js/md5.min.js"></script>
+    <script src="https://player.polyv.net/jssdk/polyv-chatroom.min.js"></script>
+    <script src="https://cdn.bootcss.com/axios/0.19.0/axios.min.js"></script>
+    <script src="https://cdn.bootcss.com/qs/6.7.0/qs.min.js"></script>
+    <script src="https://player.polyv.net/resp/rtc-sdk/latest/polyv-rtc.min.js"></script>
+    <script>
+      const channelId = ''; // 字符串频道号
+      const appId = '';
+      const timestamp = new Date().getTime();
+      const appSecret = '';
+      const sign = md5(
+        `${appSecret}appId${appId}channelId${channelId}timestamp${timestamp}${appSecret}`
+      ).toLocaleUpperCase(); // sign的生成规则请参考帮助中心文档 http://dev.polyv.net/2018/liveproduct/l-api/rule/sign/
+      const nickName = ''; //设置nickName
+      const pic =
+        'http://livestatic.videocc.net/assets/wimages/missing_face.png'; // 聊天室头像
+      const userId = ''; // 设置userId
+
+      /**
+       * @desc 获取授权和连麦的token
+       * @param 请求接口所带的参数
+       */
+      function getToken(params) {
+        return axios.post(
+          'http://api.polyv.net/live/v3/channel/common/get-token',
+          params
+        );
+      }
+
+      window.onload = function() {
+        getToken(Qs.stringify({ appId, timestamp, channelId, sign })).then(
+          res => {
+            const chatroom = new PolyvChatRoom({
+              roomId: channelId,
+              userId: userId,
+              pic: pic,
+              nick: nickName,
+              container: '.p-live__chatroom',
+              width: 340,
+              height: 405,
+              userType: 'student',
+              token: res.data.data.token,
+              roomMessage: function(data) {
+                // data为聊天室socket消息，当有聊天室消息时会触发此方法
+                console.log(data);
+              }
+            });
+            const liveSdk = new PolyvLiveSdk({
+              channelId: channelId,
+              sign: sign, // 频道验证签名
+              timestamp: timestamp, // 毫秒级时间戳
+              appId: appId, // polyv 后台的appId
+              socket: chatroom.chat.socket, // 设置socket 如果不设置为chatroom的socket，聊天室会出现在线人数不符合的情况
+              user: {
+                userId: userId, // userId 和 chatroom设置的一致
+                userName: nickName, // userName 和 chatroom设置的一致
+                pic: pic // 头像 和 chatroom设置的一致
+              }
+            });
+            liveSdk.on(PolyvLiveSdk.EVENTS.CHANNEL_DATA_INIT, (event, data) => {
+              liveSdk.setupPlayer({
+                pptEl: '.p-live__ppt',
+                el: '.p-live__player',
+                type: 'auto',
+                controllerPosition: 'ppt'
+              });
+
+              // 监听流状态变化刷新播放器
+              liveSdk.on(PolyvLiveSdk.EVENTS.STREAM_UPDATE, function() {
+                liveSdk.reloadPlayer();
+              });
+            });
+          }
+        );
+      };
+    </script>
+  </body>
+</html>
