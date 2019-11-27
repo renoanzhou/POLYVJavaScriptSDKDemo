@@ -67,7 +67,7 @@
     <script src="https://cdn.bootcss.com/qs/6.7.0/qs.min.js"></script>
     <script>
       console.info('----------云课堂直播demo----------');
-      const channelId = '423732'; // 字符串频道号, 此频道为普通直播
+      const channelId = '423732'; // 字符串频道号, 此频道为云课堂直播
       const appId = 'fc0k4v6dz3';
       const nickName = 'polyvtest'; //设置nickName
       const pic =
@@ -99,7 +99,7 @@
             container: '.p-live__chatroom',
             width: '100%',
             height: '100%',
-            userType: 'student',
+            userType: 'slice',
             token,
             roomMessage: function(data) {
               // data为聊天室socket消息，当有聊天室消息时会触发此方法
