@@ -1,2 +1,1 @@
-# POLYVJavaScriptSDKDemo
-POLYV live JavaScriptSDK Demo
+# POLYV 直播JavaScript SDK 补充demo
