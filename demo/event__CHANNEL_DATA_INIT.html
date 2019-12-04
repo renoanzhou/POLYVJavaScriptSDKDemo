@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>事件</title>
+  </head>
+  <body>
+    <div id="ppt" style="width:500px;height:300px;"></div>
+    <div id="player" style="width:500px;height:300px;"></div>
+    <script src="https://cdn.bootcss.com/axios/0.19.0/axios.min.js"></script>
+    <script src="https://player.polyv.net/livesdk/polyv-live.min.js"></script>
+    <script>
+      /**
+       * @desc 获得sign和token的接口，请修改为您自己的接口，这里仅作示范。该接口仅能拿到此频道(423732)的sign
+       */
+      function getToken(channelId) {
+        return axios.get(
+          'https://demo.polyv.net/zhouzhanhong/api/getChatToken.php',
+          {
+            params: {
+              channelId
+            }
+          }
+        );
+      }
+
+      var channelId = '423732';
+      var appId = 'fc0k4v6dz3';
+      var userId = '23333';
+
+      getToken(channelId).then(function(res) {
+        var liveSdk = new PolyvLiveSdk({
+          channelId: channelId,
+          sign: res.data.sign, // 频道验证签名
+          timestamp: res.data.timestamp, // 毫秒级时间戳
+          appId: appId, // polyv 后台的appId
+          user: {
+            userId: userId,
+            userName: 'polyv-test',
+            pic: '//livestatic.videocc.net/assets/wimages/missing_face.png'
+          }
+        });
+
+        liveSdk.on(PolyvLiveSdk.EVENTS.CHANNEL_DATA_INIT, (event, data) => {
+          console.log(data);
+        });
+      });
+    </script>
+  </body>
+</html>
