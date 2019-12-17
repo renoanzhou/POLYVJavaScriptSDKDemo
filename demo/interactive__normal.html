@@ -4,148 +4,162 @@
 <!-- 此为普通直播demo -->
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>cloud</title>
+    <link
+      rel="stylesheet"
+      href="https://player.polyv.net/jssdk/polyv-chatroom.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://player.polyv.net/resp/live-interactive/latest/polyv-interactive.min.css"
+    />
+    <style>
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        background: #111c2d;
+      }
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-  <title>cloud</title>
-  <link rel="stylesheet" href="https://player.polyv.net/jssdk/polyv-chatroom.min.css" />
-  <link rel="stylesheet" href="https://player.polyv.net/resp/live-interactive/latest/polyv-interactive.min.css">
-  <style>
-    html,
-    body {
-      margin: 0;
-      height: 100%;
-      background: #111c2d;
-    }
+      .p-live {
+        display: flex;
+        justify-content: space-between;
+        width: 1200px;
+        height: 678px;
+        margin: 0 auto;
+        padding-top: 40px;
+      }
 
-    .p-live {
-      display: flex;
-      justify-content: space-between;
-      width: 1200px;
-      height: 678px;
-      margin: 0 auto;
-      padding-top: 40px;
-    }
+      .p-live__main {
+        width: 840px;
+      }
 
-    .p-live__main {
-      width: 840px;
-    }
+      .p-live__side {
+        width: 340px;
+        font-size: 0;
+      }
 
-    .p-live__side {
-      width: 340px;
-      font-size: 0;
-    }
+      .p-live__player {
+        width: 840px;
+        height: 630px;
+      }
 
-    .p-live__player {
-      width: 840px;
-      height: 630px;
-    }
+      .p-live__chatroom {
+        height: 630px;
+        width: 340px;
+      }
+    </style>
+  </head>
 
-    .p-live__chatroom {
-      height: 630px;
-      width: 340px;
-    }
-  </style>
-</head>
-
-<body>
-  <div class="p-live">
-    <div class="p-live__main">
-      <div class="p-live__player"></div>
+  <body>
+    <div class="p-live">
+      <div class="p-live__main">
+        <div class="p-live__player"></div>
+      </div>
+      <div class="p-live__side">
+        <div class="p-live__chatroom"></div>
+      </div>
     </div>
-    <div class="p-live__side">
-      <div class="p-live__chatroom"></div>
-    </div>
-  </div>
-  <script src="https://player.polyv.net/livesdk/polyv-live.min.js"></script>
-  <script src="https://player.polyv.net/jssdk/polyv-chatroom.min.js"></script>
-  <script src="https://cdn.bootcss.com/axios/0.19.0/axios.min.js"></script>
-  <script src="https://player.polyv.net/resp/live-interactive/1.0.1/polyv-interactive.min.js"></script>
-  <script>
-    console.info('----------普通直播demo----------');
-    const channelId = '421306'; // 字符串频道号, 此频道为普通直播
-    const appId = 'fc0k4v6dz3';
-    const nickName = 'polyvtest'; //设置nickName
-    const pic =
-      'http://livestatic.videocc.net/assets/wimages/missing_face.png'; // 聊天室头像
-    const userId = '2333'; // 设置userId
+    <!-- 使用babel-polyfill,将es6转为es5 可以不引用 -->
+    <script src="https://cdn.bootcss.com/babel-polyfill/7.6.0/polyfill.min.js"></script>
+    <script src="https://player.polyv.net/livesdk/polyv-live.min.js"></script>
+    <script src="https://player.polyv.net/jssdk/polyv-chatroom.min.js"></script>
+    <script src="https://cdn.bootcss.com/axios/0.19.0/axios.min.js"></script>
+    <script src="https://player.polyv.net/resp/live-interactive/1.0.1/polyv-interactive.min.js"></script>
+    <script>
+      console.info("----------普通直播demo----------");
+      const channelId = "421306"; // 字符串频道号, 此频道为普通直播
+      const appId = "fc0k4v6dz3";
+      const nickName = "polyvtest"; //设置nickName
+      const pic =
+        "http://livestatic.videocc.net/assets/wimages/missing_face.png"; // 聊天室头像
+      const userId = "2333"; // 设置userId
+      const role = "viewer"; // 角色, 用于获取授权和连麦token http://api.polyv.net/live/v3/channel/common/get-chat-token
 
-    /**
-     * @desc 获得sign和token的接口，请修改为您自己的接口，这里仅作示范。该接口仅能拿到此频道(421306)的sign
-     */
-    function getToken(channelId) {
-      return axios.get(
-        'https://demo.polyv.net/zhouzhanhong/api/getChatToken.php',
-        {
-          params: {
-            channelId
+      /**
+       * @desc 获得sign和token的接口，请修改为您自己的接口，这里仅作示范。该接口仅能拿到此频道(421306)的sign
+       */
+      function getToken(channelId) {
+        return axios.get(
+          "https://demo.polyv.net/zhouzhanhong/api/getChatToken.php",
+          {
+            params: {
+              channelId,
+              userId,
+              role
+            }
           }
-        }
-      );
-    }
+        );
+      }
 
-    window.onload = function () {
-      getToken(channelId).then(res => {
-        const chatroom = new PolyvChatRoom({
-          roomId: channelId,
-          userId: userId,
-          pic: pic,
-          nick: nickName,
-          container: '.p-live__chatroom',
-          width: '100%',
-          height: '100%',
-          userType: 'student',
-          token: res.data.token,
-          roomMessage: function (data) {
-            // data为聊天室socket消息，当有聊天室消息时会触发此方法
-            console.log(data);
-          }
-        });
-        const Interactive = new PolyvInteractive({
-          socket: chatroom.chat.socket, // 聊天室socket实例(必填)
-          userId: userId, // userId,与连接聊天室的一致(必填)
-          nick: nickName, // 昵称,与连接聊天室的一致(必填)
-          pic: pic, // 头像,与连接聊天室的一致(必填)
-          roomId: channelId, // 频道号，与连接聊天室的一致(必填)
-          answerCardEnable: true, // 是否启用答题卡，默认：true
-          lotteryCardEnable: true, // 是否启用抽奖，默认：true
-          answerCard: { // 答题卡设置
-            styleClass: 'hehe' //设置到答题卡元素的class（选填）
-          },
-          lottery: { // 抽奖设置
-            abandonConfirm: true, // 是否出现关闭领奖信息确认框
-            abandonLevel: 2, // 点击关闭抽奖信息的等级，1(只关闭窗口，下次进来页面会重新弹出)、2 (关闭窗口，并发送放弃消息到后台，下次进来不再提示)
-            // styleClass: 'haha' // 设置到问卷元素的class（选填）
-          }
-        });
-        const liveSdk = new PolyvLiveSdk({
-          channelId: channelId,
-          sign: res.data.sign, // 频道验证签名
-          timestamp: res.data.timestamp, // 毫秒级时间戳
-          appId: appId, // polyv 后台的appId
-          socket: chatroom.chat.socket, // 设置socket 如果不设置为chatroom的socket，聊天室会出现在线人数不符合的情况
-          user: {
-            userId: userId, // userId 和 chatroom设置的一致
-            userName: nickName, // userName 和 chatroom设置的一致
-            pic: pic // 头像 和 chatroom设置的一致
-          }
-        });
-        liveSdk.on(PolyvLiveSdk.EVENTS.CHANNEL_DATA_INIT, (event, data) => {
-          liveSdk.setupPlayer({
-            el: '.p-live__player',
-            type: 'auto'
+      window.onload = function() {
+        getToken(channelId).then(res => {
+          const { liveSign, token, timestamp, mediaChannelKey } = res.data.data;
+          const chatroom = new PolyvChatRoom({
+            roomId: channelId,
+            userId: userId,
+            pic: pic,
+            nick: nickName,
+            container: ".p-live__chatroom",
+            width: "100%",
+            height: "100%",
+            userType: "slice",
+            token: token,
+            mediaChannelKey: mediaChannelKey,
+            version: "2.0",
+            roomMessage: function(data) {
+              // data为聊天室socket消息，当有聊天室消息时会触发此方法
+              console.log(data);
+            }
           });
+          const Interactive = new PolyvInteractive({
+            socket: chatroom.chat.socket, // 聊天室socket实例(必填)
+            userId: userId, // userId,与连接聊天室的一致(必填)
+            nick: nickName, // 昵称,与连接聊天室的一致(必填)
+            pic: pic, // 头像,与连接聊天室的一致(必填)
+            roomId: channelId, // 频道号，与连接聊天室的一致(必填)
+            answerCardEnable: true, // 是否启用答题卡，默认：true
+            lotteryCardEnable: true, // 是否启用抽奖，默认：true
+            answerCard: {
+              // 答题卡设置
+              styleClass: "hehe" //设置到答题卡元素的class（选填）
+            },
+            lottery: {
+              // 抽奖设置
+              abandonConfirm: true, // 是否出现关闭领奖信息确认框
+              abandonLevel: 2 // 点击关闭抽奖信息的等级，1(只关闭窗口，下次进来页面会重新弹出)、2 (关闭窗口，并发送放弃消息到后台，下次进来不再提示)
+              // styleClass: 'haha' // 设置到问卷元素的class（选填）
+            }
+          });
+          const liveSdk = new PolyvLiveSdk({
+            channelId: channelId,
+            sign: liveSign, // 频道验证签名
+            timestamp: timestamp, // 毫秒级时间戳
+            appId: appId, // polyv 后台的appId
+            socket: chatroom.chat.socket, // 设置socket 如果不设置为chatroom的socket，聊天室会出现在线人数不符合的情况
+            user: {
+              userId: userId, // userId 和 chatroom设置的一致
+              userName: nickName, // userName 和 chatroom设置的一致
+              pic: pic // 头像 和 chatroom设置的一致
+            }
+          });
+          liveSdk.on(PolyvLiveSdk.EVENTS.CHANNEL_DATA_INIT, (event, data) => {
+            liveSdk.setupPlayer({
+              el: ".p-live__player",
+              type: "auto"
+            });
 
-          // 监听流状态变化刷新播放器
-          liveSdk.on(PolyvLiveSdk.EVENTS.STREAM_UPDATE, function () {
-            liveSdk.reloadPlayer();
+            // 监听流状态变化刷新播放器
+            liveSdk.on(PolyvLiveSdk.EVENTS.STREAM_UPDATE, function() {
+              liveSdk.reloadPlayer();
+            });
           });
         });
-      });
-    };
-  </script>
-</body>
-
+      };
+    </script>
+  </body>
 </html>

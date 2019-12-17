@@ -60,6 +60,8 @@
         <div class="p-live__chatroom"></div>
       </div>
     </div>
+    <!-- 使用babel-polyfill,将es6转为es5 可以不引用 -->
+    <script src="https://cdn.bootcss.com/babel-polyfill/7.6.0/polyfill.min.js"></script>
     <script src="https://player.polyv.net/livesdk/polyv-live.min.js"></script>
     <script src="https://cdn.bootcss.com/blueimp-md5/2.11.0/js/md5.min.js"></script>
     <script src="https://player.polyv.net/jssdk/polyv-chatroom.min.js"></script>
@@ -73,7 +75,7 @@
       const pic =
         'http://livestatic.videocc.net/assets/wimages/missing_face.png'; // 聊天室头像
       const userId = '2333'; // 设置userId
-
+      const role = "viewer"; // 角色, 用于获取授权和连麦token http://api.polyv.net/live/v3/channel/common/get-chat-token
       /**
        * @desc 获得sign和token的接口，请修改为您自己的接口，这里仅作示范。该接口仅能拿到此频道(423732)的sign
        */
@@ -82,7 +84,7 @@
           'https://demo.polyv.net/zhouzhanhong/api/getChatToken.php',
           {
             params: {
-              channelId
+              channelId: channelId
             }
           }
         );
@@ -90,7 +92,7 @@
 
       window.onload = function() {
         getToken(channelId).then(res => {
-          const { sign, token, timestamp } = res.data;
+          const { liveSign, token, timestamp, mediaChannelKey } = res.data.data;
           const chatroom = new PolyvChatRoom({
             roomId: channelId,
             userId: userId,
@@ -100,7 +102,7 @@
             width: '100%',
             height: '100%',
             userType: 'slice',
-            token,
+            token: token,
             roomMessage: function(data) {
               // data为聊天室socket消息，当有聊天室消息时会触发此方法
               console.log(data);

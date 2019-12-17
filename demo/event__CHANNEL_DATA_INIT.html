@@ -7,8 +7,11 @@
     <title>事件</title>
   </head>
   <body>
+    <div>进入开发者工具的Console查看事件返回的数据</div>
     <div id="ppt" style="width:500px;height:300px;"></div>
     <div id="player" style="width:500px;height:300px;"></div>
+    <!-- 使用babel-polyfill,将es6转为es5 可以不引用 -->
+    <script src="https://cdn.bootcss.com/babel-polyfill/7.6.0/polyfill.min.js"></script>
     <script src="https://cdn.bootcss.com/axios/0.19.0/axios.min.js"></script>
     <script src="https://player.polyv.net/livesdk/polyv-live.min.js"></script>
     <script>
@@ -17,7 +20,7 @@
        */
       function getToken(channelId) {
         return axios.get(
-          'https://demo.polyv.net/zhouzhanhong/api/getChatToken.php',
+          "https://demo.polyv.net/zhouzhanhong/api/getLiveToken.php",
           {
             params: {
               channelId
@@ -26,20 +29,20 @@
         );
       }
 
-      var channelId = '423732';
-      var appId = 'fc0k4v6dz3';
-      var userId = '23333';
+      var channelId = "423732";
+      var appId = "fc0k4v6dz3";
+      var userId = "23333";
 
       getToken(channelId).then(function(res) {
         var liveSdk = new PolyvLiveSdk({
           channelId: channelId,
-          sign: res.data.sign, // 频道验证签名
-          timestamp: res.data.timestamp, // 毫秒级时间戳
+          sign: res.data.data.liveSign, // 频道验证签名
+          timestamp: res.data.data.timestamp, // 毫秒级时间戳
           appId: appId, // polyv 后台的appId
           user: {
             userId: userId,
-            userName: 'polyv-test',
-            pic: '//livestatic.videocc.net/assets/wimages/missing_face.png'
+            userName: "polyv-test",
+            pic: "//livestatic.videocc.net/assets/wimages/missing_face.png"
           }
         });
 

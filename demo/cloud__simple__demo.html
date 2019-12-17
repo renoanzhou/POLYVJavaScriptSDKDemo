@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>起步</title>
+    <style>
+     #ppt {
+        background: url("http://livestatic.videocc.net/assets/wimages/player/ppt/nolive_ppt_white.png"); /* 给ppt容器加一个自定义的默认图*/
+        background-size: contain;
+      }
+    </style>
   </head>
   <body>
     <div id="ppt" style="width:500px;height:300px;"></div>
@@ -17,7 +23,7 @@
        */
       function getToken(channelId) {
         return axios.get(
-          'https://demo.polyv.net/zhouzhanhong/api/getChatToken.php',
+          'https://demo.polyv.net/zhouzhanhong/api/getLiveToken.php',
           {
             params: {
               channelId
@@ -31,10 +37,11 @@
       var userId = '23333';
 
       getToken(channelId).then(function(res) {
+
         var liveSdk = new PolyvLiveSdk({
           channelId: channelId,
-          sign: res.data.sign, // 频道验证签名
-          timestamp: res.data.timestamp, // 毫秒级时间戳
+          sign: res.data.data.liveSign, // 频道验证签名
+          timestamp: res.data.data.timestamp, // 毫秒级时间戳
           appId: appId, // polyv 后台的appId
           user: {
             userId: userId,
